@@ -71,4 +71,9 @@ class Authors extends ActiveRecord
     {
         return $this->hasMany(BooksToAuthor::class, ['author_id' => 'id']);
     }
+
+    public function getFullName(): string
+    {
+        return $this->first_name . ' ' . $this->last_name . ' ' . $this->patronymic_name;
+    }
 }

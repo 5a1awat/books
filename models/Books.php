@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -21,13 +22,7 @@ use yii\db\ActiveRecord;
  */
 class Books extends ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName(): string
-    {
-        return 'books';
-    }
+    public array $authors = [];
 
     /**
      * {@inheritdoc}
@@ -40,6 +35,7 @@ class Books extends ActiveRecord
             [['isbn'], 'string', 'length' => 13],
             [['description'], 'string'],
             [['name', 'isbn', 'photo'], 'string', 'max' => 255],
+            [['authors'], 'safe'],
         ];
     }
 
@@ -55,7 +51,32 @@ class Books extends ActiveRecord
             'description' => 'Описание',
             'isbn'        => 'ISBN',
             'photo'       => 'Фото',
+            'authors'     => 'Авторы',
         ];
+    }
+
+    public function saveAuthors(): bool
+    {
+        Yii::$app->db->createCommand()->delete(BooksToAuthor::tableName(), ['book_id' => $this->id])->execute();
+
+        if (is_array($this->authors)) {
+            foreach ($this->authors as $authorId) {
+                Yii::$app->db->createCommand()->insert(BooksToAuthor::tableName(), [
+                    'book_id'   => $this->id,
+                    'author_id' => $authorId,
+                ])->execute();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName(): string
+    {
+        return 'books';
     }
 
     /**
@@ -66,5 +87,12 @@ class Books extends ActiveRecord
     public function getBooksToAuthors(): ActiveQuery
     {
         return $this->hasMany(BooksToAuthor::class, ['book_id' => 'id']);
+    }
+
+    public function getAuthorsList(): array
+    {
+        return array_map(function ($author) {
+            return $author->author;
+        }, $this->booksToAuthors);
     }
 }

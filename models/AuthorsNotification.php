@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use floor12\phone\PhoneValidator;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -19,6 +20,9 @@ use yii\db\ActiveRecord;
  */
 class AuthorsNotification extends ActiveRecord
 {
+    const STATUS_NEW = 1;
+    const STATUS_COMPLETE = 2;
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +38,7 @@ class AuthorsNotification extends ActiveRecord
     {
         return [
             [['author_id'], 'integer'],
-            [['phone_number'], 'string', 'max' => 255],
+            [['phone_number'], PhoneValidator::class],
             [
                 ['author_id'],
                 'exist',
@@ -42,6 +46,7 @@ class AuthorsNotification extends ActiveRecord
                 'targetClass'     => Authors::class,
                 'targetAttribute' => ['author_id' => 'id']
             ],
+            [['status'], 'default', 'value' => self::STATUS_NEW],
         ];
     }
 
@@ -53,7 +58,7 @@ class AuthorsNotification extends ActiveRecord
         return [
             'id'           => 'ID',
             'author_id'    => 'Author ID',
-            'phone_number' => 'Phone Number',
+            'phone_number' => 'Номер телефона',
         ];
     }
 
@@ -65,5 +70,10 @@ class AuthorsNotification extends ActiveRecord
     public function getAuthor(): ActiveQuery
     {
         return $this->hasOne(Authors::class, ['id' => 'author_id']);
+    }
+
+    public function sentNotification(): void
+    {
+        $this->status = self::STATUS_COMPLETE;
     }
 }
