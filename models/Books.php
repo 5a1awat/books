@@ -36,6 +36,7 @@ class Books extends ActiveRecord
             [['description'], 'string'],
             [['name', 'isbn', 'photo'], 'string', 'max' => 255],
             [['authors'], 'safe'],
+            [['isbn'], 'unique'],
         ];
     }
 
@@ -59,13 +60,11 @@ class Books extends ActiveRecord
     {
         Yii::$app->db->createCommand()->delete(BooksToAuthor::tableName(), ['book_id' => $this->id])->execute();
 
-        if (is_array($this->authors)) {
-            foreach ($this->authors as $authorId) {
-                Yii::$app->db->createCommand()->insert(BooksToAuthor::tableName(), [
-                    'book_id'   => $this->id,
-                    'author_id' => $authorId,
-                ])->execute();
-            }
+        foreach ($this->authors as $authorId) {
+            Yii::$app->db->createCommand()->insert(BooksToAuthor::tableName(), [
+                'book_id'   => $this->id,
+                'author_id' => $authorId,
+            ])->execute();
         }
 
         return true;
