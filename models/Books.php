@@ -89,7 +89,7 @@ class Books extends ActiveRecord
         return $this->hasMany(BooksToAuthor::class, ['book_id' => 'id']);
     }
 
-    public function getAuthorsList(): array
+    public function getAuthors(): array
     {
         return array_map(function ($author) {
             return $author->author;

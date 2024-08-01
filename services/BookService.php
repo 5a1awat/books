@@ -10,6 +10,7 @@ use app\models\Books;
 use yii\data\ActiveDataProvider;
 use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
+use Yii;
 
 class BookService
 {
@@ -47,22 +48,7 @@ class BookService
         $act = $model->load($postData) && $model->save() && $model->saveAuthors();
 
         if ($act) {
-            $notifications = AuthorsNotification::find()
-                ->andWhere(['author_id' => $model->authors])
-                ->andWhere(['status' => AuthorsNotification::STATUS_NEW])
-                ->all();
-
-            $message = 'Новое поступление книги: ' . $model->name;
-
-            foreach ($notifications as $notification) {
-                $status = $this->smsService->send($notification->phone_number, $message);
-                if ($status) {
-                    $doneNotification = AuthorsNotification::findOne($notification->id);
-                    $doneNotification->sentNotification();
-                    $doneNotification->save();
-                }
-            }
-
+            $this->sendNotification($model);
         }
 
         return $act;
@@ -81,5 +67,39 @@ class BookService
     public function delete(int $id): void
     {
         $this->getById($id)->delete();
+    }
+
+    private function sendNotification(Books $model): void
+    {
+        $notifications = AuthorsNotification::find()
+            ->andWhere(['author_id' => $model->authors])
+            ->andWhere(['status' => AuthorsNotification::STATUS_NEW])
+            ->all();
+
+        $message = 'Новое поступление книги: ' . $model->name;
+
+        $updatedId = [];
+        foreach ($notifications as $notification) {
+            $status = $this->smsService->send($notification->phone_number, $message);
+            if ($status) {
+                $updatedId[] = $notification->id;
+            }
+        }
+
+        $this->updateNotification($updatedId);
+    }
+
+    private function updateNotification(array $idList): void
+    {
+        if (empty($idList)) {
+            return;
+        }
+
+        Yii::$app->db->createCommand()
+            ->update(
+                AuthorsNotification::tableName(),
+                ['status' => AuthorsNotification::STATUS_COMPLETE],
+                'id IN (' . implode(', ', $idList) . ')'
+            )->execute();
     }
 }

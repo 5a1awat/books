@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /** @var app\models\Authors $model */
 /** @var app\models\Authors $author */
 
-$this->title = 'Подписка на уведомление автора: ' . $author->fullName;
+$this->title = 'Подписка на уведомление новых книг автора: ' . $author->fullName;
 YiiAsset::register($this);
 ?>
 <div class="authors-view">
@@ -23,7 +23,7 @@ YiiAsset::register($this);
         <?= $form->field($model, 'phone_number')->textInput(['maxlength' => true]) ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Отправить', ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton('Подписаться', ['class' => 'btn btn-success']) ?>
         </div>
 
         <?php

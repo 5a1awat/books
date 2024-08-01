@@ -41,7 +41,7 @@ YiiAsset::register($this);
                 'attribute' => 'authors',
                 'format' => 'raw',
                 'value'     => function ($model) {
-                    return AuthorHelper::getLink($model->getAuthorsList());
+                    return AuthorHelper::getLink($model->getAuthors());
                 },
             ],
             'year',
