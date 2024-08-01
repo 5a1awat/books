@@ -8,6 +8,12 @@ INSTALLATION
 docker compose up -d
 ~~~
 
+Создаем БД
+
+~~~
+CREATE DATABASE books CHARACTER SET utf8mb4;
+~~~
+
 Далее заходим в контейнер
 
 ~~~

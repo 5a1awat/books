@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace app\helpers;
 
-use app\models\Authors;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 class AuthorHelper

@@ -8,7 +8,7 @@ use app\services\AuthorService;
 use yii\web\Controller;
 
 /**
- * AuthorController implements the CRUD actions for Authors model.
+ * ReportsController implements the CRUD actions for Authors model.
  */
 class ReportsController extends Controller
 {

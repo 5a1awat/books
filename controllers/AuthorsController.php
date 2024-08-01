@@ -7,6 +7,7 @@ namespace app\controllers;
 use app\models\Authors;
 use app\models\AuthorsNotification;
 use app\services\AuthorService;
+use yii\db\Exception;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -99,6 +100,10 @@ class AuthorsController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @throws Exception
+     * @throws NotFoundHttpException
+     */
     public function actionNotification(int $id): string|Response
     {
         $model = new AuthorsNotification();
